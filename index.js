@@ -1,15 +1,19 @@
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
 import tweetsData from "./data.js"
 
+const replyInput = document.getElementsByClassName("reply-input")
+
 document.addEventListener("click", function(e) {
     if (e.target.dataset.like) {
         handleLikeClick(e.target.dataset.like)
     } else if (e.target.dataset.retweet) {
         handleRetweetClick(e.target.dataset.retweet)
-    } else if(e.target.dataset.reply){
+    } else if(e.target.dataset.reply) {
         handleReplyClick(e.target.dataset.reply)
     } else if (e.target.id === "tweet-btn") {
         handleTweetBtnClick()
+    } else if (e.target.dataset.replyBtn) {
+        handleReplyBtnClick(e.target.dataset.replyBtn)
     }
 })
 
@@ -60,6 +64,28 @@ function handleTweetBtnClick() {
         })
         tweetInput.value = ""
         render()
+    }ff
+}
+
+function handleReplyBtnClick(tweetId) {
+    // Returns the tweet object that includes the uuid we're clicking on in the global event listenerdw
+    const targetTweetObj = tweetsData.filter(function(tweet) {
+        return tweet.uuid.includes(tweetId)
+    })[0]
+    // Converts an HTML collection to an array
+    const replyInputArray = Array.from(replyInput)
+    const targetReplyInput = replyInputArray.filter(function(input) {
+        return input.dataset.replyInput == `${targetTweetObj.uuid}`
+    })[0]
+
+    if (targetReplyInput.value) {
+        targetTweetObj.replies.push({
+            handle: `@Scrimba`,
+            profilePic: `images/scrimbalogo.png`,
+            tweetText: targetReplyInput.value
+        })
+        targetReplyInput.value = ""
+        render()
     }
 }
 
@@ -109,6 +135,11 @@ function getFeedHtml() {
     </div>
     <div id="replies-${tweet.uuid}">
         ${repliesHtml}
+        <div class="user-reply">
+        <img src="images/scrimbalogo.png" class="profile-pic">
+        <textarea placeholder="Say what's on your mind" class="reply-input" data-reply-input="${tweet.uuid}"></textarea>
+        <button class="reply-btn" data-reply-btn="${tweet.uuid}">Reply</button>
+        </div>
     </div> 
 </div>
         `

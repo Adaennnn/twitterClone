@@ -58,7 +58,7 @@ textarea{
     line-height: 30px;
     resize: none;
 }
-
+    
 button{
     background-color: #1DA1F2;
     border: none;
@@ -129,4 +129,28 @@ button{
 /* utility */
 .hidden{
     display: none;
+}
+
+.user-reply {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 80%;
+    border-top: 1px solid lightgray;
+    padding: 20px 0 0 0;
+    margin: 10px 0 10px 40px;
+}
+
+.reply-input {
+    font-size: 14px;
+    line-height: 20px;
+    line-height: 20px;
+    width: 207px;
+}
+
+.reply-btn {
+    font-size: 10px;
+    padding: 5px 10px;
+    width: 20%;
+    margin-top: 15px;
 }
