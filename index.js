@@ -2,6 +2,9 @@ import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
 import tweetsData from "./data.js"
 
 const replyInput = document.getElementsByClassName("reply-input")
+let parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+const localStorageOrNot = parsedFeedFromLocalStorage ? parsedFeedFromLocalStorage : tweetsData
+localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
 
 document.addEventListener("click", function(e) {
     if (e.target.dataset.like) {
@@ -18,21 +21,23 @@ document.addEventListener("click", function(e) {
 })
 
 function handleLikeClick(tweetId) {
-    const targetTweetObj = tweetsData.filter(function(tweet) {
+    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+    const targetTweetObj = localStorageOrNot.filter(function(tweet) {
             return tweet.uuid.includes(tweetId)
     })[0]
-    
     if (targetTweetObj.isLiked) {
         targetTweetObj.likes--
     } else {
         targetTweetObj.likes++
     }
     targetTweetObj.isLiked = !targetTweetObj.isLiked
+    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     render()
 }
 
 function handleRetweetClick(tweetId) {
-    const targetTweetObj = tweetsData.filter(function(tweet) {
+    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+    const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
     })[0]
     if (targetTweetObj.isRetweeted) {
@@ -41,6 +46,7 @@ function handleRetweetClick(tweetId) {
         targetTweetObj.retweets++
     }
     targetTweetObj.isRetweeted = !targetTweetObj.isRetweeted
+    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     render()
 }
 
@@ -49,9 +55,10 @@ function handleReplyClick(replyId){
 }
 
 function handleTweetBtnClick() {
+    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const tweetInput = document.getElementById("tweet-input")
     if (tweetInput.value) {
-        tweetsData.unshift({
+        localStorageOrNot.unshift({
             handle: `@Scrimba`,
             profilePic: `images/scrimbalogo.png`,
             likes: 0,
@@ -62,14 +69,16 @@ function handleTweetBtnClick() {
             isRetweeted: false,
             uuid: uuidv4()
         })
+        localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
         tweetInput.value = ""
         render()
-    }ff
+    }
 }
 
 function handleReplyBtnClick(tweetId) {
     // Returns the tweet object that includes the uuid we're clicking on in the global event listenerdw
-    const targetTweetObj = tweetsData.filter(function(tweet) {
+    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+    const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
     })[0]
     // Converts an HTML collection to an array
@@ -77,13 +86,13 @@ function handleReplyBtnClick(tweetId) {
     const targetReplyInput = replyInputArray.filter(function(input) {
         return input.dataset.replyInput == `${targetTweetObj.uuid}`
     })[0]
-
     if (targetReplyInput.value) {
         targetTweetObj.replies.push({
             handle: `@Scrimba`,
             profilePic: `images/scrimbalogo.png`,
             tweetText: targetReplyInput.value
         })
+        localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
         targetReplyInput.value = ""
         render()
     }
@@ -91,7 +100,9 @@ function handleReplyBtnClick(tweetId) {
 
 function getFeedHtml() {
     let feedHtml = ""
-    tweetsData.forEach(tweet => {
+    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
+    localStorageOrNot.forEach(tweet => {
         let likeIconClass = tweet.isLiked ? "liked" : ""
         let retweetIconClass = tweet.isRetweeted ? "retweeted" : ""
         let repliesHtml = ''
@@ -148,7 +159,7 @@ function getFeedHtml() {
 }
 
 function render() {
+    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     document.getElementById("feed").innerHTML = getFeedHtml()
 }
-
 render()
