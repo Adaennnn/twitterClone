@@ -17,6 +17,10 @@ document.addEventListener("click", function(e) {
         handleTweetBtnClick()
     } else if (e.target.dataset.replyBtn) {
         handleReplyBtnClick(e.target.dataset.replyBtn)
+    } else if (e.target.dataset.deleteTweet) {
+        handleDeleteTweetClick(e.target.dataset.deleteTweet)
+    } else if (e.target.dataset.deleteReply && e.target.dataset.identifierReply) {
+        handleDeleteReplyClick(e.target.dataset.deleteReply, e.target.dataset.identifierReply)
     }
 })
 
@@ -90,12 +94,41 @@ function handleReplyBtnClick(tweetId) {
         targetTweetObj.replies.push({
             handle: `@Scrimba`,
             profilePic: `images/scrimbalogo.png`,
-            tweetText: targetReplyInput.value
+            tweetText: targetReplyInput.value,
+            uuid: uuidv4()
         })
         localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
         targetReplyInput.value = ""
         render()
     }
+}
+
+function handleDeleteTweetClick(tweetId) {
+    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+    const targetTweetObj = localStorageOrNot.filter(function(tweet) {
+        return tweet.uuid.includes(tweetId)
+    })[0]
+    localStorageOrNot.splice(targetTweetObj, 1)
+    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
+    render()
+}
+
+function handleDeleteReplyClick(tweetId, replyId) {
+    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+    const targetTweetObj = localStorageOrNot.filter(function(tweet) {
+        return tweet.uuid.includes(tweetId)
+    })[0]
+    const targetReplyObj = targetTweetObj.replies.filter(function(reply) {
+        return reply.uuid === replyId
+    })[0]
+    if (targetTweetObj.replies.includes(targetReplyObj)) {
+        const index = targetTweetObj.replies.indexOf(targetReplyObj)
+        if (index > -1) {
+            targetTweetObj.replies.splice(index, 1)
+        }
+    }
+    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
+    render()
 }
 
 function getFeedHtml() {
@@ -105,9 +138,11 @@ function getFeedHtml() {
     localStorageOrNot.forEach(tweet => {
         let likeIconClass = tweet.isLiked ? "liked" : ""
         let retweetIconClass = tweet.isRetweeted ? "retweeted" : ""
+        let myTweetOrNot = tweet.handle === "@Scrimba" ? `<i class="fa-solid fa-xmark tweet-mark" data-delete-tweet="${tweet.uuid}"></i>` : ""
         let repliesHtml = ''
         if (tweet.replies.length > 0) {
             tweet.replies.forEach(reply => {
+                let myReplyOrNot = reply.handle === "@Scrimba" ? `<i class="fa-solid fa-xmark reply-mark" data-delete-reply="${tweet.uuid}" data-identifier-reply="${reply.uuid}"></i>` : ""
                 repliesHtml += `
                             <div class="tweet-reply">
                 <div class="tweet-inner">
@@ -116,6 +151,7 @@ function getFeedHtml() {
                             <p class="handle">${reply.handle}</p>
                             <p class="tweet-text">${reply.tweetText}</p>
                         </div>
+                        ${myReplyOrNot}
                     </div>
             </div>
                 `
@@ -142,6 +178,7 @@ function getFeedHtml() {
                     ${tweet.retweets}
                 </span>
             </div>   
+            ${myTweetOrNot}
         </div>            
     </div>
     <div id="replies-${tweet.uuid}">

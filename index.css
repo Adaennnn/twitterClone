@@ -21,6 +21,17 @@ i{
     color: #999;
 }
 
+.reply-mark {
+    position: relative;
+    right: 55px;
+}
+
+.tweet-mark {
+    position: relative;
+    left: 220px;
+    bottom: 75px;
+}
+
 .liked{
     color: red;
 }
