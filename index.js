@@ -1,10 +1,11 @@
+// Imported a module that allows us to fire off a function to create a uuid
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid'
 import tweetsData from "./data.js"
 
 const replyInput = document.getElementsByClassName("reply-input")
 let parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+// Is there any data stored in local storage ? If yes, set it to it, if not, set it to the tweetsData object
 const localStorageOrNot = parsedFeedFromLocalStorage ? parsedFeedFromLocalStorage : tweetsData
-localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
 
 document.addEventListener("click", function(e) {
     if (e.target.dataset.like) {
@@ -25,7 +26,9 @@ document.addEventListener("click", function(e) {
 })
 
 function handleLikeClick(tweetId) {
+    // Re assign parsedFeedFromLocalStorage to its newest version of data stored
     parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
+    // We're storing to this variable only the tweet from tweetsdata that contains the uuid we're clicking on
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
             return tweet.uuid.includes(tweetId)
     })[0]
@@ -34,8 +37,8 @@ function handleLikeClick(tweetId) {
     } else {
         targetTweetObj.likes++
     }
+    // We're toggling the boolean isLiked on each click
     targetTweetObj.isLiked = !targetTweetObj.isLiked
-    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     render()
 }
 
@@ -50,7 +53,6 @@ function handleRetweetClick(tweetId) {
         targetTweetObj.retweets++
     }
     targetTweetObj.isRetweeted = !targetTweetObj.isRetweeted
-    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     render()
 }
 
@@ -61,6 +63,7 @@ function handleReplyClick(replyId){
 function handleTweetBtnClick() {
     parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const tweetInput = document.getElementById("tweet-input")
+    // If the input field contains any value when submitted, add the data as a new tweet object at the beginning of the feed object
     if (tweetInput.value) {
         localStorageOrNot.unshift({
             handle: `@Scrimba`,
@@ -73,14 +76,12 @@ function handleTweetBtnClick() {
             isRetweeted: false,
             uuid: uuidv4()
         })
-        localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
         tweetInput.value = ""
         render()
     }
 }
 
 function handleReplyBtnClick(tweetId) {
-    // Returns the tweet object that includes the uuid we're clicking on in the global event listenerdw
     parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
@@ -97,7 +98,6 @@ function handleReplyBtnClick(tweetId) {
             tweetText: targetReplyInput.value,
             uuid: uuidv4()
         })
-        localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
         targetReplyInput.value = ""
         render()
     }
@@ -108,8 +108,8 @@ function handleDeleteTweetClick(tweetId) {
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
     })[0]
+    // Let's remove targetTweetObj from the feed object when the function is fired
     localStorageOrNot.splice(targetTweetObj, 1)
-    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     render()
 }
 
@@ -127,20 +127,21 @@ function handleDeleteReplyClick(tweetId, replyId) {
             targetTweetObj.replies.splice(index, 1)
         }
     }
-    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     render()
 }
 
 function getFeedHtml() {
     let feedHtml = ""
     parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
-    localStorage.setItem("feed", JSON.stringify(localStorageOrNot))
     localStorageOrNot.forEach(tweet => {
+        // For each tweet, check if it's liked or retweeted, if it is, set the variables to the proper classes, or else, set the variables to empty strings
         let likeIconClass = tweet.isLiked ? "liked" : ""
         let retweetIconClass = tweet.isRetweeted ? "retweeted" : ""
+        // We check if the tweet handle equals to the Scrimba user, if it is, attach the current tweet uuid to the data set so that we can use it as a reference to delete if needed later on
         let myTweetOrNot = tweet.handle === "@Scrimba" ? `<i class="fa-solid fa-xmark tweet-mark" data-delete-tweet="${tweet.uuid}"></i>` : ""
         let repliesHtml = ''
         if (tweet.replies.length > 0) {
+            // replies is an array inside tweet, so we iterate it with a forEach
             tweet.replies.forEach(reply => {
                 let myReplyOrNot = reply.handle === "@Scrimba" ? `<i class="fa-solid fa-xmark reply-mark" data-delete-reply="${tweet.uuid}" data-identifier-reply="${reply.uuid}"></i>` : ""
                 repliesHtml += `
@@ -157,6 +158,7 @@ function getFeedHtml() {
                 `
             })
         }
+        // On each iteration, add the new data to feedHtml, anything new will update in feedHtml
         feedHtml += `
         <div class="tweet">
     <div class="tweet-inner">
