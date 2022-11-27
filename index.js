@@ -26,8 +26,6 @@ document.addEventListener("click", function(e) {
 })
 
 function handleLikeClick(tweetId) {
-    // Re assign parsedFeedFromLocalStorage to its newest version of data stored
-    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     // We're storing to this variable only the tweet from tweetsdata that contains the uuid we're clicking on
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
             return tweet.uuid.includes(tweetId)
@@ -43,7 +41,6 @@ function handleLikeClick(tweetId) {
 }
 
 function handleRetweetClick(tweetId) {
-    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
     })[0]
@@ -56,12 +53,11 @@ function handleRetweetClick(tweetId) {
     render()
 }
 
-function handleReplyClick(replyId){
+function handleReplyClick(replyId) {
     document.getElementById(`replies-${replyId}`).classList.toggle("hidden")
 }
 
 function handleTweetBtnClick() {
-    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const tweetInput = document.getElementById("tweet-input")
     // If the input field contains any value when submitted, add the data as a new tweet object at the beginning of the feed object
     if (tweetInput.value) {
@@ -82,7 +78,6 @@ function handleTweetBtnClick() {
 }
 
 function handleReplyBtnClick(tweetId) {
-    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
     })[0]
@@ -104,7 +99,6 @@ function handleReplyBtnClick(tweetId) {
 }
 
 function handleDeleteTweetClick(tweetId) {
-    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
     })[0]
@@ -114,7 +108,6 @@ function handleDeleteTweetClick(tweetId) {
 }
 
 function handleDeleteReplyClick(tweetId, replyId) {
-    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     const targetTweetObj = localStorageOrNot.filter(function(tweet) {
         return tweet.uuid.includes(tweetId)
     })[0]
@@ -132,7 +125,6 @@ function handleDeleteReplyClick(tweetId, replyId) {
 
 function getFeedHtml() {
     let feedHtml = ""
-    parsedFeedFromLocalStorage = JSON.parse(localStorage.getItem("feed"))
     localStorageOrNot.forEach(tweet => {
         // For each tweet, check if it's liked or retweeted, if it is, set the variables to the proper classes, or else, set the variables to empty strings
         let likeIconClass = tweet.isLiked ? "liked" : ""
